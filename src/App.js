@@ -1,4 +1,5 @@
-import './sass/App.sass';
+import './components/sass/App.sass';
+import BtcValue from './components/BtcValue.js';
 
 function App() {
   return (
@@ -7,6 +8,7 @@ function App() {
         <p>
           CoinXR
         </p>
+        <BtcValue />
       </header>
     </div>
   );
