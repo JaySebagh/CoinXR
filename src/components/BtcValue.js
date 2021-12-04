@@ -4,16 +4,16 @@ import React, { useState, useEffect}  from 'react';
 const BtcValue = () => {
     const [data, setData] = useState([]);
     const [input, setInput] = useState("");
+    // current conversion (either coin to currency or currency to coin)
     const [current, setCurrent] = useState("currency");
 
     useEffect(() => {
-      const getData = async () => {
+      // interval to request data every second
+      const getData = setInterval(async () => {
         const data = await axios.get("https://api.coinbase.com/v2/prices/spot?currency=USD");
         setData(data.data.data);
-        console.log(data.data.data)
-      };
-  
-      getData();
+      }, 1000);
+      return () => clearInterval(getData);
     }, []);
 
     function convertToCoin(quantity, value) {
@@ -24,7 +24,7 @@ const BtcValue = () => {
 
     function convertToCurrency(value, quantity) {
       if(!quantity) return 0
-      const formula = value*quantity;
+      const formula = Math.round(value*quantity*100) / 100;
       return formula;
     };
 
@@ -36,7 +36,6 @@ const BtcValue = () => {
       }
     };
 
-    console.log(input);
     return (
         <div>
             <input
@@ -45,12 +44,11 @@ const BtcValue = () => {
               min="0"
               // prevent "e" from being pressed
               onKeyDown={ (evt) => evt.key === 'e' && evt.preventDefault() }
-              placeholder={current === "currency" ? data.currency : data.base}
+              placeholder={current === "currency" ? `${data.currency ? data.currency : "loading..."}` : `${data.base? data.base: "loading..."}`}
               onChange={e => setInput(e.target.value)}
             />
-            <p>{current === "currency" ? `${convertToCoin(input, data.amount)} ${data.base}` : `${convertToCurrency(data.amount, input)} ${data.currency}`}</p>
             <button onClick={() => swap()}>swap</button>
-            
+            <p>{current === "currency" ? `${convertToCoin(input, data.amount)} ${data.base ? data.base : "loading..."}` : `${convertToCurrency(data.amount, input)} ${data.currency ? data.currency : "loading..."}`}</p>
         </div>
     );
   };
